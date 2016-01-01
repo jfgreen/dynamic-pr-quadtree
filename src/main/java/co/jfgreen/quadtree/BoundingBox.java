@@ -2,52 +2,63 @@ package co.jfgreen.quadtree;
 
 public class BoundingBox {
 
-    public final float x;
-    public final float y;
-    public final float width;
-    public final float height;
+    public final float startX;
+    public final float startY;
+    public final float endX;
+    public final float endY;
+    private final float midX;
+    private final float midY;
 
-    public BoundingBox(float x, float y, float width, float height) {
-        validateDimension(width);
-        validateDimension(height);
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+    public BoundingBox(float startX, float startY, float endX, float endY) {
+        validateDimension(startX, endX);
+        validateDimension(startY, endY);
+        this.startX = startX;
+        this.startY = startY;
+        this.endX = endX;
+        this.endY = endY;
+        this.midX = startX + getWidth()/2;
+        this.midY = startY + getHeight()/2;
     }
 
-    private void validateDimension(float dimension) {
-        if (dimension <= 0) {
-            throw new IllegalArgumentException("Dimensions must be a positive number.");
+    private void validateDimension(float start, float end) {
+        if (start >= end) {
+            throw new IllegalArgumentException("Start of dimension must be after end.");
         }
     }
 
-    public boolean contains(float px, float py) {
-        //It's convention that the lower and left boundaries are closed, while the upper and right boundaries are open.
+    public float getWidth() {
+        return endX - startX;
+    }
+
+    public float getHeight() {
+        return endY - startY;
+    }
+
+    public boolean contains(float x, float y) {
         return
-            px > x &&
-            py >= y &&
-            px <= x + width &&
-            py < y + height;
+                x >= startX &&
+                y >= startY &&
+                x <= endX &&
+                y <= endY;
     }
 
     public BoundingBox getTopLeftQuad() {
-        return new BoundingBox(x, y, width/2, height/2);
+        return new BoundingBox(startX, startY,  midX, midY);
     }
 
     public BoundingBox getTopRightQuad() {
-        return new BoundingBox(x + width/2, y, width/2, height/2);
+        return new BoundingBox(Math.nextUp(midX), startY, endX, midY);
     }
 
     public BoundingBox getBottomLeftQuad() {
-        return new BoundingBox(x, y + height/2, width/2, height/2);
+        return new BoundingBox(startX, Math.nextUp(midY), midX, endY);
     }
 
     public BoundingBox getBottomRightQuad() {
-        return new BoundingBox(x + width/2 , y + height/2, width/2, height/2);
+        return new BoundingBox(Math.nextUp(midX), Math.nextUp(midY), endX, endY);
     }
 
     public String toString() {
-        return String.format("Position:(%f, %f), Size:(%f, %f)", x, y, width, height);
+        return String.format("From:(%f, %f), To:(%f, %f)", startX, startY, endX, endY);
     }
 }
