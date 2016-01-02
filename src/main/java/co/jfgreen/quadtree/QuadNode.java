@@ -7,17 +7,21 @@ import java.util.stream.Stream;
 public class QuadNode {
 
     public final Optional<QuadNode> parent;
-    private final BoundingBox boundingBox;
+    private final BoundingBox box;
     private final int splitThreshold;
     private final HashSet<Point2D> points;
     private final LinkedList<QuadNode> children;
+    private final int depth;
+    private final int maxDepth;
 
-    public QuadNode(BoundingBox boundingBox, Optional<QuadNode> parent, int splitThreshold) {
-        this.boundingBox = boundingBox;
+    public QuadNode(BoundingBox box, Optional<QuadNode> parent, int splitThreshold, int depth, int maxDepth) {
+        this.box = box;
         this.points = new HashSet<>();
         this.children = new LinkedList<>();
         this.parent = parent;
         this.splitThreshold = splitThreshold;
+        this.depth = depth;
+        this.maxDepth = maxDepth;
     }
 
     public void addPoint(Point2D point) {
@@ -30,15 +34,15 @@ public class QuadNode {
     }
 
     private boolean encloses(Point2D point) {
-        return boundingBox.contains(point.getX(), point.getY());
+        return box.contains(point.getX(), point.getY());
     }
 
     public void refine() {
-        if (points.size() > splitThreshold) {
+        if (points.size() > splitThreshold && depth <= maxDepth) {
             createChildren();
             points.forEach(point -> {
                 QuadNode containingChild = findChildEnclosing(point).orElseThrow(() -> new RuntimeException(
-                        "No suitable child for point " + point + "when refining node bounding " + boundingBox));
+                        "No suitable child for point " + point + "when refining node bounding " + box));
                 containingChild.addPoint(point);
             });
             points.clear();
@@ -61,10 +65,10 @@ public class QuadNode {
     }
 
     private void createChildren() {
-        QuadNode topLeft = new QuadNode(boundingBox.getTopLeftQuad(), Optional.of(this), splitThreshold);
-        QuadNode topRight = new QuadNode(boundingBox.getTopRightQuad(), Optional.of(this), splitThreshold);
-        QuadNode bottomLeft = new QuadNode(boundingBox.getBottomLeftQuad(), Optional.of(this), splitThreshold);
-        QuadNode bottomRight = new QuadNode(boundingBox.getBottomRightQuad(), Optional.of(this), splitThreshold);
+        QuadNode topLeft = new QuadNode(box.getTopLeftQuad(), Optional.of(this), splitThreshold, depth + 1, maxDepth);
+        QuadNode topRight = new QuadNode(box.getTopRightQuad(), Optional.of(this), splitThreshold, depth + 1, maxDepth);
+        QuadNode bottomLeft = new QuadNode(box.getBottomLeftQuad(), Optional.of(this), splitThreshold, depth + 1, maxDepth);
+        QuadNode bottomRight = new QuadNode(box.getBottomRightQuad(), Optional.of(this), splitThreshold, depth + 1, maxDepth);
         children.addAll(Arrays.asList(topLeft, topRight, bottomLeft, bottomRight));// TODO: Is this most efficient?
     }
 
@@ -114,7 +118,7 @@ public class QuadNode {
         Collection<ImmutableQuadNode> childState = children.stream()
                 .map(QuadNode::getState)
                 .collect(Collectors.toList());
-        return new ImmutableQuadNode(boundingBox, points, childState);
+        return new ImmutableQuadNode(box, points, childState);
     }
 
 }

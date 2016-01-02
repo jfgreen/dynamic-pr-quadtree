@@ -21,10 +21,6 @@ This is going to be an implementation of a PR quadtree designed to handle moving
 
 - What other parameters are there, (that could be defaulted) so we can do a builder pattern
 
-- Currently things really break if we insert n+1 same points into a tree with bucket size n.
-  Either check parent or check child when making a split decision to fix this.
-  Or maybe a max depth?
-
 - Need some way of asserting that there is either children or points but never both.
 
 - What about some of node methods being leaf or connector only?
@@ -44,3 +40,5 @@ This is going to be an implementation of a PR quadtree designed to handle moving
 - Add search functionality.
 
 - Keep track of points to quadnode (make searching faster)
+
+- Possibly store current point assignments as a key.

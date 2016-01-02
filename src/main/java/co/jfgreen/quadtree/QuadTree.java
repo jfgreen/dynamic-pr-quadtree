@@ -7,8 +7,8 @@ public class QuadTree<T extends Point2D> {
 
     public final QuadNode root;
 
-    public QuadTree(float x, float y, float width, float height, int splitThreshold) {
-        root = new QuadNode(new BoundingBox(x, y, x + width, y + height), Optional.empty(), splitThreshold);
+    public QuadTree(float x, float y, float width, float height, int splitThreshold, int maxDepth) {
+        root = new QuadNode(new BoundingBox(x, y, x + width, y + height), Optional.empty(), splitThreshold, 1, maxDepth);
     }
 
     public void add(T point) {
