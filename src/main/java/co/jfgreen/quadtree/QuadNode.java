@@ -6,9 +6,9 @@ import java.util.stream.Stream;
 
 public class QuadNode {
 
+    public final Optional<QuadNode> parent;
     private final BoundingBox boundingBox;
     private final int splitThreshold;
-    public final Optional<QuadNode> parent;
     private final HashSet<Point2D> points;
     private final LinkedList<QuadNode> children;
 
@@ -29,18 +29,12 @@ public class QuadNode {
         points.remove(p);
     }
 
-    public boolean encloses(Point2D point) {
+    private boolean encloses(Point2D point) {
         return boundingBox.contains(point.getX(), point.getY());
     }
 
-    private int itemCount() {
-        return points.size();
-    }
-
-   // Transformation
-
     public void refine() {
-        if (itemCount() > splitThreshold) {
+        if (points.size() > splitThreshold) {
             createChildren();
             points.forEach(point -> {
                 QuadNode containingChild = findChildEnclosing(point).orElseThrow(() -> new RuntimeException(
@@ -54,8 +48,10 @@ public class QuadNode {
 
     public void coarsen() {
         if (!isLeaf() && children.stream().allMatch(QuadNode::isLeaf)) {
-            if (childCount() <= splitThreshold) {
-                points.addAll(gatherPoints().collect(Collectors.toList()));
+            int childCount = children.stream().mapToInt(c -> c.points.size()).sum();
+            if (childCount <= splitThreshold) {
+                List<Point2D> childPoints = children.stream().flatMap(c -> c.points.stream()).collect(Collectors.toList());
+                points.addAll(childPoints);
                 children.clear();
                 if (points.isEmpty()) {
                     parent.ifPresent(QuadNode::coarsen);
@@ -63,8 +59,6 @@ public class QuadNode {
             }
         }
     }
-
-    // WORKING DIRECTLY WITH CHILDREN
 
     private void createChildren() {
         QuadNode topLeft = new QuadNode(boundingBox.getTopLeftQuad(), Optional.of(this), splitThreshold);
@@ -74,26 +68,12 @@ public class QuadNode {
         children.addAll(Arrays.asList(topLeft, topRight, bottomLeft, bottomRight));// TODO: Is this most efficient?
     }
 
-    private int childCount() {
-        return children.stream().mapToInt(QuadNode::itemCount).sum();
-    }
-
-    public boolean isLeaf() {
+    private boolean isLeaf() {
         return children.isEmpty();
     }
 
     private Optional<QuadNode> findChildEnclosing(Point2D point) {
         return children.stream().filter(c -> c.encloses(point)).findFirst();
-    }
-
-    // Recursive stuff
-
-    private Stream<Point2D> gatherPoints() {
-        if (isLeaf()) {
-            return points.stream();
-        } else {
-            return children.stream().flatMap(QuadNode::gatherPoints);
-        }
     }
 
     public Stream<QuadNode> leaves() {
@@ -104,8 +84,8 @@ public class QuadNode {
         }
     }
 
-    public Stream<Point2D> pointsOutsideBounds() {
-        return points.stream().filter(p -> !encloses(p));
+    public Collection<Point2D> getPointsOutsideBounds() {
+        return points.stream().filter(p -> !encloses(p)).collect(Collectors.toList());
     }
 
     public Optional<QuadNode> getAncestorEnclosing(Point2D point) {
