@@ -4,17 +4,21 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class QuadNode {
+public class QuadNode<T extends Point2D> {
 
-    public final Optional<QuadNode> parent;
+    public final Optional<QuadNode<T>> parent;
     private final BoundingBox box;
     private final int splitThreshold;
-    private final HashSet<Point2D> points;
-    private final LinkedList<QuadNode> children;
+    private final HashSet<T> points;
+    private final LinkedList<QuadNode<T>> children;
     private final int depth;
     private final int maxDepth;
 
-    public QuadNode(BoundingBox box, Optional<QuadNode> parent, int splitThreshold, int depth, int maxDepth) {
+    public QuadNode(BoundingBox box, int splitThreshold, int maxDepth) {
+        this(box, Optional.empty(), splitThreshold, 1, maxDepth);
+    }
+
+    private QuadNode(BoundingBox box, Optional<QuadNode<T>> parent, int splitThreshold, int depth, int maxDepth) {
         this.box = box;
         this.points = new HashSet<>();
         this.children = new LinkedList<>();
@@ -24,16 +28,17 @@ public class QuadNode {
         this.maxDepth = maxDepth;
     }
 
-    public void addPoint(Point2D point) {
+
+    public void addPoint(T point) {
         assert encloses(point) && isLeaf();
         this.points.add(point);
     }
 
-    public void removePoint(Point2D p) {
+    public void removePoint(T p) {
         points.remove(p);
     }
 
-    private boolean encloses(Point2D point) {
+    private boolean encloses(T point) {
         return box.contains(point.getX(), point.getY());
     }
 
@@ -41,7 +46,7 @@ public class QuadNode {
         if (points.size() > splitThreshold && depth <= maxDepth) {
             createChildren();
             points.forEach(point -> {
-                QuadNode containingChild = findChildEnclosing(point).orElseThrow(() -> new RuntimeException(
+                QuadNode<T> containingChild = findChildEnclosing(point).orElseThrow(() -> new RuntimeException(
                         "No suitable child for point " + point + "when refining node bounding " + box));
                 containingChild.addPoint(point);
             });
@@ -54,7 +59,7 @@ public class QuadNode {
         if (!isLeaf() && children.stream().allMatch(QuadNode::isLeaf)) {
             int childCount = children.stream().mapToInt(c -> c.points.size()).sum();
             if (childCount <= splitThreshold) {
-                List<Point2D> childPoints = children.stream().flatMap(c -> c.points.stream()).collect(Collectors.toList());
+                List<T> childPoints = children.stream().flatMap(c -> c.points.stream()).collect(Collectors.toList());
                 points.addAll(childPoints);
                 children.clear();
                 if (points.isEmpty()) {
@@ -65,22 +70,26 @@ public class QuadNode {
     }
 
     private void createChildren() {
-        QuadNode topLeft = new QuadNode(box.getTopLeftQuad(), Optional.of(this), splitThreshold, depth + 1, maxDepth);
-        QuadNode topRight = new QuadNode(box.getTopRightQuad(), Optional.of(this), splitThreshold, depth + 1, maxDepth);
-        QuadNode bottomLeft = new QuadNode(box.getBottomLeftQuad(), Optional.of(this), splitThreshold, depth + 1, maxDepth);
-        QuadNode bottomRight = new QuadNode(box.getBottomRightQuad(), Optional.of(this), splitThreshold, depth + 1, maxDepth);
+        QuadNode<T> topLeft = createChild(box.getTopLeftQuad());
+        QuadNode<T> topRight = createChild(box.getTopRightQuad());
+        QuadNode<T> bottomLeft = createChild(box.getBottomLeftQuad());
+        QuadNode<T> bottomRight = createChild(box.getBottomRightQuad());
         children.addAll(Arrays.asList(topLeft, topRight, bottomLeft, bottomRight));// TODO: Is this most efficient?
+    }
+
+    private QuadNode<T> createChild(BoundingBox box) {
+        return new QuadNode<>(box, Optional.of(this), splitThreshold, depth + 1, maxDepth);
     }
 
     private boolean isLeaf() {
         return children.isEmpty();
     }
 
-    private Optional<QuadNode> findChildEnclosing(Point2D point) {
+    private Optional<QuadNode<T>> findChildEnclosing(T point) {
         return children.stream().filter(c -> c.encloses(point)).findFirst();
     }
 
-    public Stream<QuadNode> leaves() {
+    public Stream<QuadNode<T>> leaves() {
         if (isLeaf()) {
             return Stream.of(this);
         } else {
@@ -88,11 +97,11 @@ public class QuadNode {
         }
     }
 
-    public Collection<Point2D> getPointsOutsideBounds() {
+    public Collection<T> getPointsOutsideBounds() {
         return points.stream().filter(p -> !encloses(p)).collect(Collectors.toList());
     }
 
-    public Optional<QuadNode> getAncestorEnclosing(Point2D point) {
+    public Optional<QuadNode<T>> getAncestorEnclosing(T point) {
         return parent.flatMap(p -> {
             if (p.encloses(point)) {
                 return Optional.of(p);
@@ -102,7 +111,7 @@ public class QuadNode {
         });
     }
 
-    public Optional<QuadNode> findLeafEnclosing(Point2D point) {
+    public Optional<QuadNode<T>> findLeafEnclosing(T point) {
         if (isLeaf()) {
             if (encloses(point)) {
                 return Optional.of(this);
@@ -114,12 +123,15 @@ public class QuadNode {
         }
     }
 
-    public ImmutableQuadNode getState() {
+    public ImmutableQuadNode<T> getState() {
         Collection<ImmutableQuadNode> childState = children.stream()
                 .map(QuadNode::getState)
                 .collect(Collectors.toList());
-        return new ImmutableQuadNode(box, points, childState);
+        return new ImmutableQuadNode<>(box, points, childState);
     }
+
+
+
 
 }
 
