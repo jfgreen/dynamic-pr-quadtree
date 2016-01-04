@@ -42,3 +42,5 @@ This is going to be an implementation of a PR quadtree designed to handle moving
 - Keep track of points to quadnode (make searching faster)
 
 - Possibly store current point assignments as a key.
+
+- Carefully consider what should return a stream and what should be a collection.

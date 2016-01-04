@@ -1,6 +1,7 @@
 package co.jfgreen.quadtree;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class QuadTree<T extends Point2D> {
 
@@ -17,7 +18,7 @@ public class QuadTree<T extends Point2D> {
         destination.refine();
     }
 
-    public ImmutableQuadNode getState() {
+    public ImmutableQuadNode<T> getState() {
         return root.getState();
     }
 
@@ -37,6 +38,10 @@ public class QuadTree<T extends Point2D> {
         }));
         populatedNodes.forEach(QuadNode::refine);
         parentsOfVacatedNodes.forEach(QuadNode::coarsen);
+    }
+
+    public Collection<T> queryByBoundingBox(float startX, float startY, float endX, float endY) {
+        return root.queryByBoundingBox(new BoundingBox(startX, startY, endX, endY)).collect(Collectors.toList());
     }
 
 }

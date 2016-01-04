@@ -61,4 +61,13 @@ public class BoundingBox {
     public String toString() {
         return String.format("From:(%f, %f), To:(%f, %f)", startX, startY, endX, endY);
     }
+
+    public boolean intersects(BoundingBox other) {
+        return !(
+                   other.startX > endX
+                || other.endX < startX
+                || other.startY > endY
+                || other.endY < startY
+        );
+    }
 }
