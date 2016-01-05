@@ -134,7 +134,7 @@ public class QuadNode<T extends Point2D> {
         if (isLeaf()) {
             return points.stream().filter(p -> area.contains(p.getX(), p.getY()));
         } else {
-            return children.stream().filter(c -> area.intersects(c.box)).flatMap(c -> queryByBoundingBox(area));
+            return children.stream().filter(c -> area.intersects(c.box)).flatMap(c -> c.queryByBoundingBox(area));
         }
 
     }
