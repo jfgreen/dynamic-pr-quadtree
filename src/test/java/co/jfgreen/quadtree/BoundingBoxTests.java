@@ -94,4 +94,28 @@ public class BoundingBoxTests {
         new BoundingBox(10, 10, 20, 5);
     }
 
+    @Test
+    public void BoundingBox_shouldIntersect_givenBoxInside() {
+        BoundingBox box1 = new BoundingBox(10, 10, 20, 20);
+        BoundingBox box2 = new BoundingBox(15, 15, 17, 17);
+        assertTrue(box1.intersects(box2));
+        assertTrue(box2.intersects(box1));
+    }
+
+    @Test
+    public void BoundingBox_shouldNotIntersect_givenBoxAbove() {
+        BoundingBox box1 = new BoundingBox(10, 10, 20, 20);
+        BoundingBox box2 = new BoundingBox(10, 30, 20, 40);
+        assertFalse(box1.intersects(box2));
+        assertFalse(box2.intersects(box1));
+    }
+
+    @Test
+    public void BoundingBox_shouldNotIntersect_givenBoxToSide() {
+        BoundingBox box1 = new BoundingBox(10, 10, 20, 20);
+        BoundingBox box2 = new BoundingBox(30, 10, 40, 20);
+        assertFalse(box1.intersects(box2));
+        assertFalse(box2.intersects(box1));
+    }
+
 }
