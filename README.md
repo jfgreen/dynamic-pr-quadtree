@@ -29,18 +29,12 @@ This is going to be an implementation of a PR quadtree designed to handle moving
 
 - When all is implemented, revisit methods, simplify, consolidate and optimise.
 
-- Fix potential discrepancy between childCount() and gatherPoints().size() in node.
-
-- Make things final where possible.
-
 - Refactor and optimise trees update().
 
 - Could speed up searching for children using some sneaky maths.
 
-- Add search functionality.
-
-- Keep track of points to quadnode (make searching faster)
-
-- Possibly store current point assignments as a key.
+- Keep track of points to quadnode (make searching for nn faster? allow easy removal? iterating through populated leaves?)
 
 - Carefully consider what should return a stream and what should be a collection.
+
+- Benchmark against Apache SIS.
