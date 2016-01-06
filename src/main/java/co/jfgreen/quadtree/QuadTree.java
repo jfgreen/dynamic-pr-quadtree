@@ -40,8 +40,12 @@ public class QuadTree<T extends Point2D> {
         parentsOfVacatedNodes.forEach(QuadNode::coarsen);
     }
 
-    public Collection<T> queryByBoundingBox(float startX, float startY, float endX, float endY) {
-        return root.queryByBoundingBox(new BoundingBox(startX, startY, endX, endY)).collect(Collectors.toList());
+    public Collection<T> queryByBoundingBox(float x, float y, float width, float height) {
+        return root.queryByShape(new BoundingBox(x, y, x+width, y+height)).collect(Collectors.toList());
+    }
+
+    public Collection<T> queryByPointRadius(float x, float y, float radius) {
+        return root.queryByShape(new Circle(x, y, radius)).collect(Collectors.toList());
     }
 
 }

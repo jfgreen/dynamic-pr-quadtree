@@ -130,11 +130,15 @@ public class QuadNode<T extends Point2D> {
         return new ImmutableQuadNode<>(box, points, childState);
     }
 
-    public Stream<T> queryByBoundingBox(BoundingBox area) {
+    public Stream<T> queryByShape(Shape area) {
         if (isLeaf()) {
-            return points.stream().filter(p -> area.contains(p.getX(), p.getY()));
+            if (area.contains(box)) {
+                return points.stream();
+            } else {
+                return points.stream().filter(p -> area.contains(p.getX(), p.getY()));
+            }
         } else {
-            return children.stream().filter(c -> area.intersects(c.box)).flatMap(c -> c.queryByBoundingBox(area));
+            return children.stream().filter(c -> area.intersects(c.box)).flatMap(c -> c.queryByShape(area));
         }
 
     }

@@ -1,13 +1,14 @@
 package co.jfgreen.quadtree;
 
-public class BoundingBox {
+
+public class BoundingBox implements Shape {
 
     public final float startX;
     public final float startY;
     public final float endX;
     public final float endY;
-    private final float midX;
-    private final float midY;
+    public final float midX;
+    public final float midY;
 
     public BoundingBox(float startX, float startY, float endX, float endY) {
         validateDimension(startX, endX);
@@ -64,10 +65,19 @@ public class BoundingBox {
 
     public boolean intersects(BoundingBox other) {
         return !(
-                   other.startX > endX
-                || other.endX < startX
-                || other.startY > endY
-                || other.endY < startY
+                other.startX > endX ||
+                other.endX < startX ||
+                other.startY > endY ||
+                other.endY < startY
         );
+    }
+
+    @Override
+    public boolean contains(BoundingBox other) {
+        return
+                other.startX > startX &&
+                other.endX < endX &&
+                other.startY > startY &&
+                other.endY < endY;
     }
 }
