@@ -8,7 +8,7 @@ public class QuadNode<T extends Point2D> {
 
     public final Optional<QuadNode<T>> parent;
     private final BoundingBox box;
-    private final int splitThreshold;
+    private final int maxBucketSize;
     private final HashSet<T> points;
     private final LinkedList<QuadNode<T>> children;
     private final int depth;
@@ -18,12 +18,12 @@ public class QuadNode<T extends Point2D> {
         this(box, Optional.empty(), splitThreshold, 1, maxDepth);
     }
 
-    private QuadNode(BoundingBox box, Optional<QuadNode<T>> parent, int splitThreshold, int depth, int maxDepth) {
+    private QuadNode(BoundingBox box, Optional<QuadNode<T>> parent, int maxBucketSize, int depth, int maxDepth) {
         this.box = box;
         this.points = new HashSet<>();
         this.children = new LinkedList<>();
         this.parent = parent;
-        this.splitThreshold = splitThreshold;
+        this.maxBucketSize = maxBucketSize;
         this.depth = depth;
         this.maxDepth = maxDepth;
     }
@@ -43,7 +43,7 @@ public class QuadNode<T extends Point2D> {
     }
 
     public void refine() {
-        if (points.size() > splitThreshold && depth <= maxDepth) {
+        if (points.size() > maxBucketSize && depth <= maxDepth) {
             createChildren();
             points.forEach(point -> {
                 QuadNode<T> containingChild = findChildEnclosing(point).orElseThrow(() -> new RuntimeException(
@@ -58,7 +58,7 @@ public class QuadNode<T extends Point2D> {
     public void coarsen() {
         if (!isLeaf() && children.stream().allMatch(QuadNode::isLeaf)) {
             int childCount = children.stream().mapToInt(c -> c.points.size()).sum();
-            if (childCount <= splitThreshold) {
+            if (childCount <= maxBucketSize) {
                 List<T> childPoints = children.stream().flatMap(c -> c.points.stream()).collect(Collectors.toList());
                 points.addAll(childPoints);
                 children.clear();
@@ -78,7 +78,7 @@ public class QuadNode<T extends Point2D> {
     }
 
     private QuadNode<T> createChild(BoundingBox box) {
-        return new QuadNode<>(box, Optional.of(this), splitThreshold, depth + 1, maxDepth);
+        return new QuadNode<>(box, Optional.of(this), maxBucketSize, depth + 1, maxDepth);
     }
 
     private boolean isLeaf() {

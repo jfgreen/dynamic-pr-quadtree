@@ -19,8 +19,6 @@ This is going to be an implementation of a PR quadtree designed to handle moving
 
 - Idea for speedup: Implement a quadtree node factory that uses an object pool?
 
-- What other parameters are there, (that could be defaulted) so we can do a builder pattern
-
 - Need some way of asserting that there is either children or points but never both.
 
 - What about some of node methods being leaf or connector only?
@@ -38,3 +36,5 @@ This is going to be an implementation of a PR quadtree designed to handle moving
 - Carefully consider what should return a stream and what should be a collection.
 
 - Benchmark against Apache SIS.
+
+- Write javadoc.
