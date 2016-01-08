@@ -118,4 +118,31 @@ public class BoundingBoxTests {
         assertFalse(box2.intersects(box1));
     }
 
+    @Test
+    public void BoundingBox_shouldContainBox_givenBoxEncompassed() {
+        BoundingBox box1 = new BoundingBox(10, 10, 20, 20);
+        BoundingBox box2 = new BoundingBox(11, 11, 19, 19);
+        assertTrue(box1.contains(box2));
+    }
+
+    @Test
+    public void BoundingBox_shouldNotContainBox_givenBoxEncompassing() {
+        BoundingBox box1 = new BoundingBox(10, 10, 20, 20);
+        BoundingBox box2 = new BoundingBox(9, 9, 21, 21);
+        assertFalse(box1.contains(box2));
+    }
+
+    @Test
+    public void BoundingBox_shouldNotContainBox_givenBoxIntersecting() {
+        BoundingBox box1 = new BoundingBox(10, 10, 20, 20);
+        BoundingBox box2 = new BoundingBox(5, 5, 15, 15);
+        assertFalse(box1.contains(box2));
+    }
+
+    @Test
+    public void BoundingBox_shouldNotContainBox_givenBoxNotIntersecting() {
+        BoundingBox box1 = new BoundingBox(10, 10, 20, 20);
+        BoundingBox box2 = new BoundingBox(30, 30, 40, 40);
+        assertFalse(box1.contains(box2));
+    }
 }
