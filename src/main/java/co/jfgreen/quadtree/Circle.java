@@ -18,7 +18,7 @@ public class Circle implements Shape {
         float dx = Math.abs(this.x - x);
         float dy = Math.abs(this.y - y);
         float distanceFromCentre = (float) Math.sqrt((dx*dx) + (dy*dy));
-        return distanceFromCentre < radius;
+        return distanceFromCentre <= radius;
     }
 
 
