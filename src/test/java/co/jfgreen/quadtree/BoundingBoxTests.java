@@ -79,7 +79,7 @@ public class BoundingBoxTests {
     }
 
     @Test
-    public void toString_shouldNotThrowException_givenBox() {
+    public void toString_shouldNotThrowException() {
         BoundingBox box = new BoundingBox(10, 15, 20, 20);
         box.toString();
     }
@@ -95,7 +95,7 @@ public class BoundingBoxTests {
     }
 
     @Test
-    public void BoundingBox_shouldIntersect_givenBoxInside() {
+    public void intersects_shouldReturnTrue_givenBoxInside() {
         BoundingBox box1 = new BoundingBox(10, 10, 20, 20);
         BoundingBox box2 = new BoundingBox(15, 15, 17, 17);
         assertTrue(box1.intersects(box2));
@@ -103,7 +103,7 @@ public class BoundingBoxTests {
     }
 
     @Test
-    public void BoundingBox_shouldNotIntersect_givenBoxAbove() {
+    public void intersects_shouldReturnFalse_givenBoxAbove() {
         BoundingBox box1 = new BoundingBox(10, 10, 20, 20);
         BoundingBox box2 = new BoundingBox(10, 30, 20, 40);
         assertFalse(box1.intersects(box2));
@@ -111,7 +111,7 @@ public class BoundingBoxTests {
     }
 
     @Test
-    public void BoundingBox_shouldNotIntersect_givenBoxToSide() {
+    public void intersects_shouldReturnFalse_givenBoxToSide() {
         BoundingBox box1 = new BoundingBox(10, 10, 20, 20);
         BoundingBox box2 = new BoundingBox(30, 10, 40, 20);
         assertFalse(box1.intersects(box2));
@@ -119,28 +119,28 @@ public class BoundingBoxTests {
     }
 
     @Test
-    public void BoundingBox_shouldContainBox_givenBoxEncompassed() {
+    public void intersects_shouldReturnTrue_givenBoxEncompassed() {
         BoundingBox box1 = new BoundingBox(10, 10, 20, 20);
         BoundingBox box2 = new BoundingBox(11, 11, 19, 19);
         assertTrue(box1.contains(box2));
     }
 
     @Test
-    public void BoundingBox_shouldNotContainBox_givenBoxEncompassing() {
+    public void intersects_shouldReturnFalse_givenBoxEncompassing() {
         BoundingBox box1 = new BoundingBox(10, 10, 20, 20);
         BoundingBox box2 = new BoundingBox(9, 9, 21, 21);
         assertFalse(box1.contains(box2));
     }
 
     @Test
-    public void BoundingBox_shouldNotContainBox_givenBoxIntersecting() {
+    public void intersects_shouldReturnFalse_givenBoxIntersecting() {
         BoundingBox box1 = new BoundingBox(10, 10, 20, 20);
         BoundingBox box2 = new BoundingBox(5, 5, 15, 15);
         assertFalse(box1.contains(box2));
     }
 
     @Test
-    public void BoundingBox_shouldNotContainBox_givenBoxNotIntersecting() {
+    public void intersects_shouldReturnFalse_givenBoxNotIntersecting() {
         BoundingBox box1 = new BoundingBox(10, 10, 20, 20);
         BoundingBox box2 = new BoundingBox(30, 30, 40, 40);
         assertFalse(box1.contains(box2));
