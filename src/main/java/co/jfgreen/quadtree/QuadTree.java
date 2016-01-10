@@ -7,7 +7,7 @@ public class QuadTree<T extends Point2D> {
 
     private final QuadNode<T> root;
 
-    private QuadTree(float x, float y, float width, float height, int maxBucketSize, int maxDepth) {
+    protected QuadTree(float x, float y, float width, float height, int maxBucketSize, int maxDepth) {
         root = new QuadNode<>(new BoundingBox(x, y, x + width, y + height), maxBucketSize, maxDepth);
     }
 
@@ -47,37 +47,5 @@ public class QuadTree<T extends Point2D> {
     public Collection<T> queryByPointRadius(float x, float y, float radius) {
         return root.queryByShape(new Circle(x, y, radius)).collect(Collectors.toList());
     }
-
-    public static class Builder {
-
-        private float x;
-        private float y;
-        private float width;
-        private float height;
-        private int maxBucketSize = 4;
-        private int maxDepth = 10;
-
-        public Builder (float x, float y, float width, float height) {
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
-        }
-
-        public Builder maxBucketSize(int maxBucketSize) {
-            this.maxBucketSize = maxBucketSize;
-            return this;
-        }
-
-        public Builder maxDepth(int maxDepth) {
-            this.maxDepth = maxDepth;
-            return this;
-        }
-
-        public QuadTree build() {
-            return new QuadTree(x, y, width, height, maxBucketSize, maxDepth);
-        }
-    }
-
 
 }
