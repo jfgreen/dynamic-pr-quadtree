@@ -6,26 +6,24 @@ import java.util.stream.Stream;
 
 public class QuadNode<T extends Point2D> {
 
-    public final Optional<QuadNode<T>> parent;
+    private final Optional<QuadNode<T>> parent;
     private final BoundingBox box;
     private final int maxBucketSize;
     private final HashSet<T> points;
     private final LinkedList<QuadNode<T>> children;
     private final int depth;
-    private final int maxDepth;
 
-    public QuadNode(BoundingBox box, int splitThreshold, int maxDepth) {
-        this(box, Optional.empty(), splitThreshold, 1, maxDepth);
+    public QuadNode(BoundingBox box, int splitThreshold, int depth) {
+        this(box, Optional.empty(), splitThreshold, depth);
     }
 
-    private QuadNode(BoundingBox box, Optional<QuadNode<T>> parent, int maxBucketSize, int depth, int maxDepth) {
+    private QuadNode(BoundingBox box, Optional<QuadNode<T>> parent, int maxBucketSize, int depth) {
         this.box = box;
         this.points = new HashSet<>();
         this.children = new LinkedList<>();
         this.parent = parent;
         this.maxBucketSize = maxBucketSize;
         this.depth = depth;
-        this.maxDepth = maxDepth;
     }
 
 
@@ -43,7 +41,7 @@ public class QuadNode<T extends Point2D> {
     }
 
     public void refine() {
-        if (points.size() > maxBucketSize && depth <= maxDepth) {
+        if (points.size() > maxBucketSize && depth > 0) {
             createChildren();
             points.forEach(point -> {
                 QuadNode<T> containingChild = findChildEnclosing(point).orElseThrow(() -> new RuntimeException(
@@ -78,7 +76,7 @@ public class QuadNode<T extends Point2D> {
     }
 
     private QuadNode<T> createChild(BoundingBox box) {
-        return new QuadNode<>(box, Optional.of(this), maxBucketSize, depth + 1, maxDepth);
+        return new QuadNode<>(box, Optional.of(this), maxBucketSize, depth - 1);
     }
 
     private boolean isLeaf() {
@@ -141,6 +139,10 @@ public class QuadNode<T extends Point2D> {
             return children.stream().filter(c -> area.intersects(c.box)).flatMap(c -> c.queryByShape(area));
         }
 
+    }
+
+    public Optional<QuadNode<T>> getParent() {
+        return parent;
     }
 
 }

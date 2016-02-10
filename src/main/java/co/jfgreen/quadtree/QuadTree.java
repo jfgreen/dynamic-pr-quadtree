@@ -7,8 +7,16 @@ public class QuadTree<T extends Point2D> {
 
     private final QuadNode<T> root;
 
-    protected QuadTree(float x, float y, float width, float height, int maxBucketSize, int maxDepth) {
-        root = new QuadNode<>(new BoundingBox(x, y, x + width, y + height), maxBucketSize, maxDepth);
+    public static int DEFAULT_MAX_BUCKET_SIZE = 4;
+    public static int DEFAULT_MAX_DEPTH = 10;
+
+    public QuadTree(float x, float y, float width, float height) {
+       this(x, y, width, height, DEFAULT_MAX_BUCKET_SIZE, DEFAULT_MAX_DEPTH);
+    }
+
+    public QuadTree(float x, float y, float width, float height, int maxBucketSize, int maxDepth) {
+        BoundingBox box = new BoundingBox(x, y, x + width, y + height);
+        root = new QuadNode<>(box, maxBucketSize, maxDepth);
     }
 
     public void add(T point) {
@@ -33,7 +41,7 @@ public class QuadTree<T extends Point2D> {
                     .orElseThrow(() -> new RuntimeException("No suitable home for point " + p));
             leaf.removePoint(p);
             newHome.addPoint(p);
-            leaf.parent.ifPresent(parentsOfVacatedNodes::add);
+            leaf.getParent().ifPresent(parentsOfVacatedNodes::add);
             populatedNodes.add(newHome);
         }));
         populatedNodes.forEach(QuadNode::refine);
