@@ -79,20 +79,12 @@ public class QuadNode<T extends Point2D> {
         return new QuadNode<>(box, Optional.of(this), maxBucketSize, depth - 1);
     }
 
-    private boolean isLeaf() {
+    public boolean isLeaf() {
         return children.isEmpty();
     }
 
     private Optional<QuadNode<T>> findChildEnclosing(T point) {
         return children.stream().filter(c -> c.encloses(point)).findFirst();
-    }
-
-    public Stream<QuadNode<T>> leaves() {
-        if (isLeaf()) {
-            return Stream.of(this);
-        } else {
-            return children.stream().flatMap(QuadNode::leaves);
-        }
     }
 
     public Collection<T> getPointsOutsideBounds() {
@@ -128,22 +120,24 @@ public class QuadNode<T extends Point2D> {
         return new ImmutableQuadNode<>(box, points, childState);
     }
 
-    public Stream<T> queryByShape(Shape area) {
-        if (isLeaf()) {
-            if (area.contains(box)) {
-                return points.stream();
-            } else {
-                return points.stream().filter(p -> area.contains(p.getX(), p.getY()));
-            }
-        } else {
-            return children.stream().filter(c -> area.intersects(c.box)).flatMap(c -> c.queryByShape(area));
-        }
-
-    }
-
     public Optional<QuadNode<T>> getParent() {
         return parent;
     }
 
+    public Collection<QuadNode<T>> childrenIntersecting(Shape area) {
+        return children.stream().filter(c -> area.intersects(c.box)).collect(Collectors.toList());
+    }
+
+    public Collection<T> getPointsEnclosedBy(Shape area) {
+        if (area.contains(box)) {
+            return points;
+        } else {
+            return points.stream().filter(p -> area.contains(p.getX(), p.getY())).collect(Collectors.toList());
+        }
+    }
+
+    public LinkedList<QuadNode<T>> getChildren() {
+        return children;
+    }
 }
 

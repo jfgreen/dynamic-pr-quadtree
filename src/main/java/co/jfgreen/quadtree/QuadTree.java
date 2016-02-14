@@ -1,6 +1,7 @@
 package co.jfgreen.quadtree;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class QuadTree<T extends Point2D> {
@@ -33,7 +34,7 @@ public class QuadTree<T extends Point2D> {
     public void update() {
         Set<QuadNode<T>> parentsOfVacatedNodes = new HashSet<>();
         Set<QuadNode<T>> populatedNodes = new HashSet<>();
-        root.leaves().forEach(leaf -> leaf.getPointsOutsideBounds().forEach(p -> {
+        leaves().forEach(leaf -> leaf.getPointsOutsideBounds().forEach(p -> {
             //TODO: Optimise by searching from root in certain cases.
             QuadNode<T> newHome = leaf.getAncestorEnclosing(p)
                     .orElseThrow(() -> new RuntimeException("No suitable ancestor for point " + p))
@@ -49,11 +50,43 @@ public class QuadTree<T extends Point2D> {
     }
 
     public Collection<T> queryByBoundingBox(float x, float y, float width, float height) {
-        return root.queryByShape(new BoundingBox(x, y, x+width, y+height)).collect(Collectors.toList());
+        return queryByShape(new BoundingBox(x, y, x+width, y+height));
     }
 
     public Collection<T> queryByPointRadius(float x, float y, float radius) {
-        return root.queryByShape(new Circle(x, y, radius)).collect(Collectors.toList());
+        return queryByShape(new Circle(x, y, radius));
+    }
+
+    private Collection<T> queryByShape(Shape area) {
+        Set<T> foundPoints= new HashSet<>();
+        traverse((node) -> {
+            if (node.isLeaf()) foundPoints.addAll(node.getPointsEnclosedBy(area));
+            return node.childrenIntersecting(area);
+        });
+        return foundPoints;
+    }
+
+    private Collection<QuadNode<T>> leaves() {
+        return allNodes().stream().filter(QuadNode::isLeaf).collect(Collectors.toList());
+    }
+
+    // TODO: Do we need this function
+    private Collection<QuadNode<T>> allNodes() {
+        Collection<QuadNode<T>> nodes = new LinkedList<>();
+        traverse((node) -> {
+            nodes.add(node);
+            return node.getChildren();
+        });
+        return nodes;
+    }
+
+    private void traverse(Function<QuadNode<T>, Collection<QuadNode<T>>> visitor) {
+        Queue<QuadNode<T>> nodesToExplore = new LinkedList<>();
+        nodesToExplore.add(root);
+        while (!nodesToExplore.isEmpty()) {
+            QuadNode<T> currentNode = nodesToExplore.remove();
+            nodesToExplore.addAll(visitor.apply(currentNode));
+        }
     }
 
 }
