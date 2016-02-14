@@ -2,7 +2,6 @@ package co.jfgreen.quadtree;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class QuadNode<T extends Point2D> {
 
@@ -40,34 +39,35 @@ public class QuadNode<T extends Point2D> {
         return box.contains(point.getX(), point.getY());
     }
 
-    public void refine() {
-        if (points.size() > maxBucketSize && depth > 0) {
-            createChildren();
-            points.forEach(point -> {
-                QuadNode<T> containingChild = findChildEnclosing(point).orElseThrow(() -> new RuntimeException(
-                        "No suitable child for point " + point + "when refining node bounding " + box));
-                containingChild.addPoint(point);
-            });
-            points.clear();
-            children.forEach(QuadNode::refine);
-        }
+    public boolean isRefinable() {
+        return points.size() > maxBucketSize && depth > 0;
     }
 
-    public void coarsen() {
-        if (!isLeaf() && children.stream().allMatch(QuadNode::isLeaf)) {
-            int childCount = children.stream().mapToInt(c -> c.points.size()).sum();
-            if (childCount <= maxBucketSize) {
-                List<T> childPoints = children.stream().flatMap(c -> c.points.stream()).collect(Collectors.toList());
-                points.addAll(childPoints);
-                children.clear();
-                if (points.isEmpty()) {
-                    parent.ifPresent(QuadNode::coarsen);
-                }
-            }
-        }
+    public boolean isCoursenable() {
+        boolean childrenAreLeaves = children.stream().allMatch(QuadNode::isLeaf);
+        int combinedChildPointCount = children.stream().mapToInt(c -> c.points.size()).sum();
+        return (!isLeaf() && childrenAreLeaves) && combinedChildPointCount <= maxBucketSize;
     }
 
-    private void createChildren() {
+    public void distributePointsToChildren() {
+        points.forEach(point -> {
+            QuadNode<T> containingChild = findChildEnclosing(point).orElseThrow(() -> new RuntimeException(
+                    "No suitable child for point " + point + "when refining node bounding " + box));
+            containingChild.addPoint(point);
+        });
+        points.clear();
+    }
+
+    public void gatherPointsFromChildren() {
+        List<T> childPoints = children.stream().flatMap(c -> c.points.stream()).collect(Collectors.toList());
+        points.addAll(childPoints);
+    }
+
+    public void destroyChildren() {
+        children.clear();
+    }
+
+    public void createChildren() {
         QuadNode<T> topLeft = createChild(box.getTopLeftQuad());
         QuadNode<T> topRight = createChild(box.getTopRightQuad());
         QuadNode<T> bottomLeft = createChild(box.getBottomLeftQuad());
@@ -139,5 +139,10 @@ public class QuadNode<T extends Point2D> {
     public LinkedList<QuadNode<T>> getChildren() {
         return children;
     }
+
+    public boolean isEmpty() {
+       return points.isEmpty();
+    }
+
 }
 

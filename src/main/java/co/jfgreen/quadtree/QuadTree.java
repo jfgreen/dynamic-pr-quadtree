@@ -24,7 +24,7 @@ public class QuadTree<T extends Point2D> {
         QuadNode<T> destination = root.findLeafEnclosing(point).orElseThrow(() -> new RuntimeException(
                 "No suitable node for point " + point + "when adding to tree."));
         destination.addPoint(point);
-        destination.refine();
+        refine(destination);
     }
 
     public ImmutableQuadNode<T> getState() {
@@ -45,8 +45,26 @@ public class QuadTree<T extends Point2D> {
             leaf.getParent().ifPresent(parentsOfVacatedNodes::add);
             populatedNodes.add(newHome);
         }));
-        populatedNodes.forEach(QuadNode::refine);
-        parentsOfVacatedNodes.forEach(QuadNode::coarsen);
+        populatedNodes.forEach(this::refine);
+        parentsOfVacatedNodes.forEach(this::coarsen);
+    }
+
+    private void refine(QuadNode<T> node) {
+        if (node.isRefinable()) {
+            node.createChildren();
+            node.distributePointsToChildren();
+            node.getChildren().forEach(this::refine);
+        }
+    }
+
+    private void coarsen(QuadNode<T> node) {
+        if (node.isCoursenable()) {
+            node.gatherPointsFromChildren();
+            node.destroyChildren();
+            if (node.isEmpty()) {
+                node.getParent().ifPresent(this::coarsen);
+            }
+        }
     }
 
     public Collection<T> queryByBoundingBox(float x, float y, float width, float height) {
@@ -70,7 +88,7 @@ public class QuadTree<T extends Point2D> {
         return allNodes().stream().filter(QuadNode::isLeaf).collect(Collectors.toList());
     }
 
-    // TODO: Do we need this function
+    // TODO: Do we need this function to be seperate from leaves?
     private Collection<QuadNode<T>> allNodes() {
         Collection<QuadNode<T>> nodes = new LinkedList<>();
         traverse((node) -> {
