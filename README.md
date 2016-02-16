@@ -6,8 +6,6 @@ This is going to be an implementation of a PR quadtree designed to handle moving
 
 -> First and foremost. Write some tests. <-
 
-- Consider whats in the tree and whats in the node.
-
 - Possible update optimisations:
     1) Keep track of points, if they have moved, and if so their old and new nodes.
     2) If movement deltas are tracked, the search for the new node can be optimised.
