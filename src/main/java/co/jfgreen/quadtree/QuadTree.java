@@ -21,7 +21,7 @@ public class QuadTree<T extends Point2D> {
     }
 
     public void add(T point) {
-        QuadNode<T> destination = root.findLeafEnclosing(point).orElseThrow(() -> new RuntimeException(
+        QuadNode<T> destination = findLeafEnclosing(root, point).orElseThrow(() -> new RuntimeException(
                 "No suitable node for point " + point + "when adding to tree."));
         destination.addPoint(point);
         refine(destination);
@@ -36,9 +36,9 @@ public class QuadTree<T extends Point2D> {
         Set<QuadNode<T>> populatedNodes = new HashSet<>();
         leaves().forEach(leaf -> leaf.getPointsOutsideBounds().forEach(p -> {
             //TODO: Optimise by searching from root in certain cases.
-            QuadNode<T> newHome = leaf.getAncestorEnclosing(p)
-                    .orElseThrow(() -> new RuntimeException("No suitable ancestor for point " + p))
-                    .findLeafEnclosing(p)
+            QuadNode<T> ancestor = findAncestorEnclosing(leaf, p)
+                    .orElseThrow(() -> new RuntimeException("No suitable ancestor for point " + p));
+            QuadNode<T> newHome = findLeafEnclosing(ancestor, p)
                     .orElseThrow(() -> new RuntimeException("No suitable home for point " + p));
             leaf.removePoint(p);
             newHome.addPoint(p);
@@ -47,6 +47,22 @@ public class QuadTree<T extends Point2D> {
         }));
         populatedNodes.forEach(this::refine);
         parentsOfVacatedNodes.forEach(this::coarsen);
+    }
+
+    public Optional<QuadNode<T>> findAncestorEnclosing(QuadNode<T> node, T point) {
+        Optional<QuadNode<T>> parent = node.getParent();
+        while(parent.map(p -> !p.encloses(point)).orElse(false)) {
+            parent = parent.flatMap(QuadNode::getParent);
+        }
+        return parent;
+    }
+
+    public Optional<QuadNode<T>> findLeafEnclosing(QuadNode<T> node, T point) {
+        Optional<QuadNode<T>> currentNode = Optional.of(node);
+        while(currentNode.map(p -> !p.isLeaf()).orElse(false)) {
+            currentNode = currentNode.flatMap(c -> c.findChildEnclosing(point));
+        }
+        return currentNode;
     }
 
     private void refine(QuadNode<T> node) {

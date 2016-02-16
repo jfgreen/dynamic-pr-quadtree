@@ -35,7 +35,7 @@ public class QuadNode<T extends Point2D> {
         points.remove(p);
     }
 
-    private boolean encloses(T point) {
+    public boolean encloses(T point) {
         return box.contains(point.getX(), point.getY());
     }
 
@@ -83,34 +83,12 @@ public class QuadNode<T extends Point2D> {
         return children.isEmpty();
     }
 
-    private Optional<QuadNode<T>> findChildEnclosing(T point) {
+    public Optional<QuadNode<T>> findChildEnclosing(T point) {
         return children.stream().filter(c -> c.encloses(point)).findFirst();
     }
 
     public Collection<T> getPointsOutsideBounds() {
         return points.stream().filter(p -> !encloses(p)).collect(Collectors.toList());
-    }
-
-    public Optional<QuadNode<T>> getAncestorEnclosing(T point) {
-        return parent.flatMap(p -> {
-            if (p.encloses(point)) {
-                return Optional.of(p);
-            } else {
-                return p.getAncestorEnclosing(point);
-            }
-        });
-    }
-
-    public Optional<QuadNode<T>> findLeafEnclosing(T point) {
-        if (isLeaf()) {
-            if (encloses(point)) {
-                return Optional.of(this);
-            } else {
-                return Optional.empty();
-            }
-        } else {
-            return findChildEnclosing(point).flatMap(c -> c.findLeafEnclosing(point));
-        }
     }
 
     public ImmutableQuadNode<T> getState() {
