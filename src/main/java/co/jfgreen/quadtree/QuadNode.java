@@ -12,8 +12,8 @@ public class QuadNode<T extends Point2D> {
     private final LinkedList<QuadNode<T>> children;
     private final int depth;
 
-    public QuadNode(BoundingBox box, int splitThreshold, int depth) {
-        this(box, Optional.empty(), splitThreshold, depth);
+    public QuadNode(BoundingBox box, int maxBucketSize, int depth) {
+        this(box, Optional.empty(), maxBucketSize, depth);
     }
 
     private QuadNode(BoundingBox box, Optional<QuadNode<T>> parent, int maxBucketSize, int depth) {
