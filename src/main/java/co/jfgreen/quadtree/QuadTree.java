@@ -44,12 +44,12 @@ public class QuadTree<T extends Point2D> {
         parentsOfVacatedNodes.forEach(QuadNode::coarsen);
     }
 
-    public QuadNode<T> findAncestorEnclosing(QuadNode<T> node, T point) {
+    private QuadNode<T> findAncestorEnclosing(QuadNode<T> node, T point) {
         return node.findAncestorEnclosing(point).
                 orElseThrow(() -> new RuntimeException("No suitable ancestor for point " + point));
     }
 
-    public QuadNode<T> findLeafEnclosing(QuadNode<T> node, T point) {
+    private QuadNode<T> findLeafEnclosing(QuadNode<T> node, T point) {
         return node.findLeafEnclosing(point).orElseThrow(
                 () -> new RuntimeException("No suitable home for point " + point));
     }

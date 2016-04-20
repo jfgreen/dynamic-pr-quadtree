@@ -2,6 +2,7 @@ package co.jfgreen.quadtree;
 
 import org.junit.Before;
 import org.junit.Test;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -12,7 +13,7 @@ public class QuadTreeTest {
 
     @Before
     public void setupTree() {
-        tree = new QuadTree<>(0,0, 100, 100);
+        tree = new QuadTree<>(0, 0, 100, 100);
     }
 
     @Test
@@ -31,9 +32,9 @@ public class QuadTreeTest {
 
     @Test
     public void queryByPointRadius_shouldReturnPoints_givenAreaEncompassingSomePoints() {
-        NamedPoint point1 = new NamedPoint("TestPoint1", 10,10);
-        NamedPoint point2 = new NamedPoint("TestPoint2", 42,70);
-        NamedPoint point3 = new NamedPoint("TestPoint3", 95,85);
+        NamedPoint point1 = new NamedPoint("TestPoint1", 10, 10);
+        NamedPoint point2 = new NamedPoint("TestPoint2", 42, 70);
+        NamedPoint point3 = new NamedPoint("TestPoint3", 95, 85);
         NamedPoint point4 = new NamedPoint("TestPoint4", 76, 70);
         NamedPoint point5 = new NamedPoint("TestPoint5", 88, 45);
         tree.add(point1);
@@ -52,6 +53,51 @@ public class QuadTreeTest {
         assertThat(tree.queryByBoundingBox(10, 10, 20, 20), is(empty()));
     }
 
+    @Test
+    public void queryByBoundingBox_shouldReturnPoint_givenAreaEncompassingPoint() {
+        throw new NotImplementedException();
+    }
+
+    @Test
+    public void queryByBoundingBox_shouldReturnPoints_givenAreaEncompassingSomePoints() {
+        throw new NotImplementedException();
+    }
+
+    @Test
+    public void getState_shouldReturnStateOfTree() {
+        throw new NotImplementedException();
+    }
+
+    @Test
+    public void update_shouldUpdateTree_givenPointsHaveMoved() {
+        throw new NotImplementedException();
+    }
+
+    @Test
+    public void update_shouldNotUpdateTree_givenPointsHaveNotMoved() {
+        throw new NotImplementedException();
+    }
+
+    @Test
+    public void queryByPointRadius_shouldReturnPoints_givenPointsMovedIntoQueryArea() {
+        throw new NotImplementedException();
+    }
+
+    @Test
+    public void queryByBoundingBox_shouldReturnPoints_givenPointsMovedIntoQueryArea() {
+        throw new NotImplementedException();
+    }
+
+    @Test
+    public void queryByPointRadius_shouldReturnNoPoints_givenPointsMovedOutOfQueryArea() {
+        throw new NotImplementedException();
+    }
+
+    @Test
+    public void queryByBoundingBox_shouldReturnNoPoints_givenPointsMovedOutOfQueryArea() {
+        throw new NotImplementedException();
+    }
+
 
 }
 
@@ -59,19 +105,8 @@ public class QuadTreeTest {
 
 Things to test:
 
-- Single point.
-- Multi point.
-- Query by point radius.
-- Query by box.
-- Updating. - moving in and out of regions
-
 - Point outside tree
 - Area outside tree
-
-
-
-For each try a variety of cases.
-
 
 
  */
