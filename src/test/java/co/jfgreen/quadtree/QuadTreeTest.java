@@ -2,7 +2,6 @@ package co.jfgreen.quadtree;
 
 import org.junit.Before;
 import org.junit.Test;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -14,6 +13,17 @@ public class QuadTreeTest {
     @Before
     public void setupTree() {
         tree = new QuadTree<>(0, 0, 100, 100);
+    }
+
+
+    @Test
+    public void addPoint_shouldNotThrowException_givenPointInsideTreeBounds() {
+        throw new UnsupportedOperationException("Not yet implemented.");
+    }
+
+    @Test
+    public void addPoint_shouldThrowException_givenPointOutsideTreeBounds() {
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Test
@@ -55,58 +65,55 @@ public class QuadTreeTest {
 
     @Test
     public void queryByBoundingBox_shouldReturnPoint_givenAreaEncompassingPoint() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Test
     public void queryByBoundingBox_shouldReturnPoints_givenAreaEncompassingSomePoints() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Test
     public void getState_shouldReturnStateOfTree() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Test
     public void update_shouldUpdateTree_givenPointsHaveMoved() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Test
     public void update_shouldNotUpdateTree_givenPointsHaveNotMoved() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Test
     public void queryByPointRadius_shouldReturnPoints_givenPointsMovedIntoQueryArea() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Test
     public void queryByBoundingBox_shouldReturnPoints_givenPointsMovedIntoQueryArea() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Test
     public void queryByPointRadius_shouldReturnNoPoints_givenPointsMovedOutOfQueryArea() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     @Test
     public void queryByBoundingBox_shouldReturnNoPoints_givenPointsMovedOutOfQueryArea() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 
+    @Test void queryByPointRadius_shouldReturnNoPoints_givenQueryOutsideTreeBounds() {
+        throw new UnsupportedOperationException("Not yet implemented.");
+    }
+
+    @Test void queryByBoundingBox_shouldReturnNoPoints_givenQueryOutsideTreeBounds() {
+        throw new UnsupportedOperationException("Not yet implemented.");
+    }
 
 }
-
-/*
-
-Things to test:
-
-- Point outside tree
-- Area outside tree
-
-
- */
