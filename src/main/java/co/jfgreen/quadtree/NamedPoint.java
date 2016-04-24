@@ -46,4 +46,13 @@ public class NamedPoint implements Point2D {
     public int hashCode() {
         return name.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "NamedPoint{" +
+                "name='" + name + '\'' +
+                ", x=" + x +
+                ", y=" + y +
+                '}';
+    }
 }

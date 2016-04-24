@@ -20,4 +20,6 @@ or add it as a configurable feature. Optimisations to consider:
     * Keep track of points to quadnode (make searching for nn faster? allow easy removal? iterating through populated leaves?)
     * Carefully consider what should return a stream and what should be a collection.
     * Really understand the performance of the data structures being used here.
+    * Prune empty nodes.
+    * Experiment with different representations of children, eg four explicit variables/list/array/both?
 - Then when all that is done, write javadoc.

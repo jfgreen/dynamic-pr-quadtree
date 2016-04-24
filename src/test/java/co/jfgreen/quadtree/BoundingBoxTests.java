@@ -26,19 +26,19 @@ public class BoundingBoxTests {
     }
 
     @Test
-    public void getWidth_shouldReturnWidth_givenBox() {
+    public void getWidth_shouldReturnWidth() {
         BoundingBox box = new BoundingBox(10, 10, 30, 40);
         assertThat(box.getWidth(), is(20F));
     }
 
     @Test
-    public void getHeight_shouldReturnHeight_givenBox() {
+    public void getHeight_shouldReturnHeight() {
         BoundingBox box = new BoundingBox(10, 10, 30, 40);
         assertThat(box.getHeight(), is(30F));
     }
 
     @Test
-    public void getTopLeftQuad_shouldReturnTopLeftQuad_givenBox() {
+    public void getTopLeftQuad_shouldReturnTopLeftQuad() {
         BoundingBox box = new BoundingBox(10, 10, 20, 20);
         BoundingBox topLeftQuad = box.getTopLeftQuad();
         assertThat(topLeftQuad.startX, is(10F));
@@ -49,7 +49,7 @@ public class BoundingBoxTests {
 
 
     @Test
-    public void getTopRightQuad_shouldReturnTopRightQuad_givenBox() {
+    public void getTopRightQuad_shouldReturnTopRightQuad() {
         BoundingBox box = new BoundingBox(10, 10, 20, 20);
         BoundingBox topRightQuad = box.getTopRightQuad();
         assertThat(topRightQuad.startX, is(Math.nextUp(15F)));
@@ -59,7 +59,7 @@ public class BoundingBoxTests {
     }
 
     @Test
-    public void getBottomLeftQuad_shouldReturnBottomLeftQuad_givenBox() {
+    public void getBottomLeftQuad_shouldReturnBottomLeftQuad() {
         BoundingBox box = new BoundingBox(10, 10, 20, 20);
         BoundingBox bottomLeftQuad = box.getBottomLeftQuad();
         assertThat(bottomLeftQuad.startX, is(10F));
@@ -69,7 +69,7 @@ public class BoundingBoxTests {
     }
 
     @Test
-    public void getBottomRightQuad_shouldReturnBottomRightQuad_givenBox() {
+    public void getBottomRightQuad_shouldReturnBottomRightQuad() {
         BoundingBox box = new BoundingBox(10, 10, 20, 20);
         BoundingBox bottomRightQuad = box.getBottomRightQuad();
         assertThat(bottomRightQuad.startX, is(Math.nextUp(15F)));
