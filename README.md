@@ -21,4 +21,5 @@ or add it as a configurable feature. Optimisations to consider:
     * Carefully consider what should return a stream and what should be a collection.
     * Really understand the performance of the data structures being used here.
     * Prune empty nodes.
+    * Can we add parallelism anywhere? Thread safety?
 - Then when all that is done, write javadoc.

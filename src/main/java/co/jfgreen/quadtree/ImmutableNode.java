@@ -38,6 +38,7 @@ public class ImmutableNode<T extends Point2D> {
     public boolean isEmpty() {
         return items.isEmpty();
     }
+
     public Optional<ImmutableNode<T>> getTopLeft() {
        return getImmutableChild(topLeft);
     }
