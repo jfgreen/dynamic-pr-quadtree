@@ -14,10 +14,6 @@ public class ImmutableNode<T extends Point2D> {
     private final Node<T> bottomLeft;
     private final Node<T> bottomRight;
 
-    public ImmutableNode(BoundingBox bounds, Collection<T> items) {
-        this(bounds, items, null, null, null, null);
-    }
-
     public ImmutableNode(BoundingBox bounds, Collection<T> items,
                          Node<T> topLeft,
                          Node<T> topRight,

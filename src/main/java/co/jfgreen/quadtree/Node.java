@@ -3,19 +3,18 @@ package co.jfgreen.quadtree;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Node<T extends Point2D> {
-
-    private final int TOP_LEFT = 0;
-    private final int TOP_RIGHT = 1;
-    private final int BOTTOM_LEFT = 2;
-    private final int BOTTOM_RIGHT = 3;
 
     private final Node<T> parent;
     private final BoundingBox box;
     private final int maxBucketSize;
     private final HashSet<T> points;
-    private final ArrayList<Node<T>> children;
+    private Node<T> topLeft;
+    private Node<T> topRight;
+    private Node<T> bottomLeft;
+    private Node<T> bottomRight;
     private final int depth;
 
     public Node(BoundingBox box, int maxBucketSize, int depth) {
@@ -25,7 +24,6 @@ public class Node<T extends Point2D> {
     private Node(BoundingBox box, Node<T> parent, int maxBucketSize, int depth) {
         this.box = box;
         this.points = new HashSet<>();
-        this.children = new ArrayList<>(4);
         this.parent = parent;
         this.maxBucketSize = maxBucketSize;
         this.depth = depth;
@@ -36,6 +34,11 @@ public class Node<T extends Point2D> {
         this.points.add(point);
     }
 
+    private Stream<Node<T>> children() {
+        return Stream.of(topLeft, topRight, bottomLeft, bottomRight) ;
+    }
+
+
     public void removePoint(T p) {
         points.remove(p);
     }
@@ -45,7 +48,7 @@ public class Node<T extends Point2D> {
     }
 
     private boolean isLeaf() {
-        return children.isEmpty();
+        return topLeft == null && topRight == null && bottomLeft == null && bottomRight == null;
     }
 
     public Collection<T> getPointsOutsideBounds() {
@@ -53,21 +56,14 @@ public class Node<T extends Point2D> {
     }
 
     public ImmutableNode<T> getState() {
-        if (children.isEmpty()) {
-            return new ImmutableNode<T>(box, points);
-        } else {
-            return new ImmutableNode<T>(box, points,
-                    children.get(TOP_LEFT),
-                    children.get(TOP_RIGHT),
-                    children.get(BOTTOM_LEFT),
-                    children.get(BOTTOM_RIGHT));
-        }
+        return new ImmutableNode<T>(box, points, topLeft, topRight, bottomLeft, bottomRight);
     }
 
     public Optional<Node<T>> getParent() {
         return Optional.ofNullable(parent);
     }
 
+    //TODO: Kinda smelly, remove and use a hashmap instead
     public Collection<Node<T>> leaves() {
         Collection<Node<T>> leaves = new LinkedList<>();
         traverse((node) -> {
@@ -75,7 +71,7 @@ public class Node<T extends Point2D> {
                 leaves.add(node);
                 return Collections.EMPTY_LIST;
             } else {
-                return node.children;
+                return node.children().collect(Collectors.toList());
             }
         });
         return leaves;
@@ -95,7 +91,7 @@ public class Node<T extends Point2D> {
     }
 
     private Collection<Node<T>> childrenIntersecting(Shape area) {
-        return children.stream().filter(c -> area.intersects(c.box)).collect(Collectors.toList());
+        return children().filter(c -> area.intersects(c.box)).collect(Collectors.toList());
     }
 
     private Collection<T> getPointsEnclosedBy(Shape area) {
@@ -119,7 +115,7 @@ public class Node<T extends Point2D> {
         if (isRefinable()) {
             createChildren();
             distributePointsToChildren();
-            children.forEach(Node::refine);
+            children().forEach(Node::refine);
         }
     }
 
@@ -128,11 +124,10 @@ public class Node<T extends Point2D> {
     }
 
     private void createChildren() {
-        // The order here is important
-        children.add(createChild(box.getTopLeftQuad()));
-        children.add(createChild(box.getTopRightQuad()));
-        children.add(createChild(box.getBottomLeftQuad()));
-        children.add(createChild(box.getBottomRightQuad()));
+        topLeft = createChild(box.getTopLeftQuad());
+        topRight = createChild(box.getTopRightQuad());
+        bottomLeft = createChild(box.getBottomLeftQuad());
+        bottomRight= createChild(box.getBottomRightQuad());
     }
 
     private Node<T> createChild(BoundingBox box) {
@@ -159,18 +154,21 @@ public class Node<T extends Point2D> {
     }
 
     private boolean isCoursenable() {
-        boolean childrenAreLeaves = children.stream().allMatch(Node::isLeaf);
-        int combinedChildPointCount = children.stream().mapToInt(c -> c.points.size()).sum();
+        boolean childrenAreLeaves = children().allMatch(Node::isLeaf);
+        int combinedChildPointCount = children().mapToInt(c -> c.points.size()).sum();
         return (!isLeaf() && childrenAreLeaves) && combinedChildPointCount <= maxBucketSize;
     }
 
     private void gatherPointsFromChildren() {
-        List<T> childPoints = children.stream().flatMap(c -> c.points.stream()).collect(Collectors.toList());
+        List<T> childPoints = children().flatMap(c -> c.points.stream()).collect(Collectors.toList());
         points.addAll(childPoints);
     }
 
     private void destroyChildren() {
-        children.clear();
+        topLeft = null;
+        topRight = null;
+        bottomLeft = null;
+        bottomRight = null;
     }
 
     public Optional<Node<T>> findAncestorEnclosing(T point) {
@@ -190,7 +188,7 @@ public class Node<T extends Point2D> {
     }
 
     private Optional<Node<T>> findChildEnclosing(T point) {
-        return children.stream().filter(c -> c.encloses(point)).findFirst();
+        return children().filter(c -> c.encloses(point)).findFirst();
     }
 
 }
