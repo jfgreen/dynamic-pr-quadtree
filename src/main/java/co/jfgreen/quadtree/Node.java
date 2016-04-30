@@ -30,7 +30,16 @@ public class Node<T extends Point2D> {
     }
 
     public void addPoint(T point) {
-        assert encloses(point) && isLeaf();
+        if (!encloses(point)) {
+           throw new RuntimeException("Point added to node that doesn't enclose it");
+        }
+        if (!isLeaf()) {
+            throw new RuntimeException("Point added to node that isn't a leaf");
+        }
+        //TODO: Once we add an index to quadtree, move this check there.
+        if (points.contains(point)) {
+            throw new QuadTreeException("Point already exists in tree");
+        }
         this.points.add(point);
     }
 

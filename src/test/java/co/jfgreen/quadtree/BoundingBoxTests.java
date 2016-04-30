@@ -85,12 +85,12 @@ public class BoundingBoxTests {
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void BoundingBox_shouldThrowException_givenNegativeWidth() {
+    public void constructor_shouldThrowException_givenNegativeWidth() {
         new BoundingBox(10, 10, 5, 20);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void BoundingBox_shouldThrowException_givenNegativeHeight() {
+    public void constructor_shouldThrowException_givenNegativeHeight() {
         new BoundingBox(10, 10, 20, 5);
     }
 

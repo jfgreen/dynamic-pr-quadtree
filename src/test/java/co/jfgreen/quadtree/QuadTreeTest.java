@@ -49,6 +49,24 @@ public class QuadTreeTest {
         return node.orElseThrow(incorrectTree());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void constructor_shouldThrowException_givenNegativeSize() {
+        new QuadTree<>(0,0, -100, -100);
+    }
+
+    @Test(expected = QuadTreeException.class)
+    public void addPoint_shouldThrowException_givenPointAlreadyAdded() {
+        NamedPoint point = new NamedPoint("TestPoint", 20, 20);
+        tree.add(point);
+        tree.add(point);
+    }
+
+    @Test
+    public void addPoint_shouldNotThrowException_givenTwoPointsInSamePosition() {
+        addPoint("1", 20, 20);
+        addPoint("2", 20, 20);
+    }
+
     @Test
     public void addPoint_shouldNotThrowException_givenPointInsideTreeBounds() {
         addPoint("TestPoint", 50, 50);
@@ -268,13 +286,26 @@ public class QuadTreeTest {
         assertTrue(tree.queryByBoundingBox(200, 30, 10, 10).isEmpty());
     }
 
-    //TODO: Query engulfing tree.
+    @Test
+    public void queryByPointRadius_shouldReturnAllPoints_givenQueryEngulfingTree() {
+        NamedPoint point1 = addPoint("1", 20, 20);
+        NamedPoint point2 = addPoint("2", 90, 75);
+        NamedPoint point3 = addPoint("3", 28, 50);
+        assertThat(tree.queryByPointRadius(50, 50, 100), containsInAnyOrder(point1, point2, point3));
+    }
+
+    @Test
+    public void queryByBoundingBox_shouldReturnAllPoints_givenQueryEngulfingTree() {
+        NamedPoint point1 = addPoint("1", 20, 20);
+        NamedPoint point2 = addPoint("2", 90, 75);
+        NamedPoint point3 = addPoint("3", 28, 50);
+        assertThat(tree.queryByBoundingBox(-10,-10, 200, 200), containsInAnyOrder(point1, point2, point3));
+    }
 
     //TODO: Test that get state should return immutable result (Maybe test this in immutable state classes tests)
-    //TODO: What happens if point is added twice (by hashcode)?
-    //TODO: What happens if point is added twice (by by position)?
     //TODO: What about a negative size for the tree?
-    //TODO: What about a tree that spans negative coordinates?
     //TODO: What about queries centered outside tree, but intersecting with tree.
+    //TODO: What about a tree that has negative item capacity
+    //TODO: What about a tree that has negative max depth
 
 }
