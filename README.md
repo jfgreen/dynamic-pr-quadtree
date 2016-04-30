@@ -1,5 +1,7 @@
 ## Dynamic Quadtree
 
+[![Build Status](https://travis-ci.org/jfgreen/dynamic-pr-quadtree.svg?branch=master)](https://travis-ci.org/jfgreen/dynamic-pr-quadtree)
+
 This is going to be an implementation of a PR quadtree designed to handle moving points.
 
 ## TODO:
