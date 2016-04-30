@@ -103,7 +103,7 @@ public class QuadTreeTest {
         NamedPoint point3 = addPoint("TestPoint3", 95, 85);
         NamedPoint point4 = addPoint("TestPoint4", 76, 70);
         NamedPoint point5 = addPoint("TestPoint5", 88, 45);
-        assertThat(tree.queryByBoundingBox(75,60,25,30), containsInAnyOrder(point3, point4));
+        assertThat(tree.queryByBoundingBox(75, 60, 25, 30), containsInAnyOrder(point3, point4));
     }
 
     @Test
@@ -213,46 +213,68 @@ public class QuadTreeTest {
     public void queryByPointRadius_shouldReturnPoints_givenPointsMovedIntoQueryArea() {
         // Add point & make sure its outside of query range
         NamedPoint point1 = addPoint("1", 25, 25);
-        assertTrue(tree.queryByPointRadius(75,75,5).isEmpty());
+        assertTrue(tree.queryByPointRadius(75, 75, 5).isEmpty());
         // Move point inside query range
         point1.moveTo(72, 76);
         tree.update();
         // Assert that point is now inside query range
-        assertThat(tree.queryByPointRadius(75,75,5), contains(point1));
+        assertThat(tree.queryByPointRadius(75, 75, 5), contains(point1));
     }
 
-    /*
 
     @Test
     public void queryByBoundingBox_shouldReturnPoints_givenPointsMovedIntoQueryArea() {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        // Add point & make sure its outside of query range
+        NamedPoint point1 = addPoint("1", 25, 25);
+        assertTrue(tree.queryByBoundingBox(70, 70, 10, 10).isEmpty());
+        // Move point inside query range
+        point1.moveTo(72, 76);
+        tree.update();
+        // Assert that point is now inside query range
+        assertThat(tree.queryByBoundingBox(70, 70, 10, 10), contains(point1));
     }
 
     @Test
     public void queryByPointRadius_shouldReturnNoPoints_givenPointsMovedOutOfQueryArea() {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        // Add point & make sure its inside of query range
+        NamedPoint point1 = addPoint("1", 24, 22);
+        assertThat(tree.queryByPointRadius(25, 25, 5), contains(point1));
+        // Move point outside query range
+        point1.moveTo(75, 75);
+        tree.update();
+        // Assert that point is now outside query range
+        assertTrue(tree.queryByPointRadius(25, 25, 5).isEmpty());
     }
 
     @Test
     public void queryByBoundingBox_shouldReturnNoPoints_givenPointsMovedOutOfQueryArea() {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        // Add point & make sure its inside of query range
+        NamedPoint point1 = addPoint("1", 24, 22);
+        assertThat(tree.queryByBoundingBox(20, 20, 10, 10), contains(point1));
+        // Move point outside query range
+        point1.moveTo(75, 75);
+        tree.update();
+        // Assert that point is now outside query range
+        assertTrue(tree.queryByBoundingBox(20, 20, 10, 10).isEmpty());
     }
 
     @Test
     public void queryByPointRadius_shouldReturnNoPoints_givenQueryOutsideTreeBounds() {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        assertTrue(tree.queryByPointRadius(200, 30, 10).isEmpty());
     }
 
     @Test
     public void queryByBoundingBox_shouldReturnNoPoints_givenQueryOutsideTreeBounds() {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        assertTrue(tree.queryByBoundingBox(200, 30, 10, 10).isEmpty());
     }
-    */
+
+    //TODO: Query engulfing tree.
 
     //TODO: Test that get state should return immutable result (Maybe test this in immutable state classes tests)
     //TODO: What happens if point is added twice (by hashcode)?
     //TODO: What happens if point is added twice (by by position)?
     //TODO: What about a negative size for the tree?
     //TODO: What about a tree that spans negative coordinates?
+    //TODO: What about queries centered outside tree, but intersecting with tree.
 
 }
