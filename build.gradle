@@ -17,3 +17,9 @@ task bench(type: JavaExec, dependsOn: [classes, testClasses]) {
     classpath = sourceSets.test.runtimeClasspath
     main = "co.jfgreen.quadtree.Benchmark";
 }
+
+test {
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
