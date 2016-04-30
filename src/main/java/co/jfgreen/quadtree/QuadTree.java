@@ -1,7 +1,5 @@
 package co.jfgreen.quadtree;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
-
 import java.util.*;
 
 public class QuadTree<T extends Point2D> {
