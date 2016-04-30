@@ -1,5 +1,7 @@
 package co.jfgreen.quadtree;
 
+import com.sun.javaws.exceptions.InvalidArgumentException;
+
 import java.util.*;
 
 public class QuadTree<T extends Point2D> {
@@ -8,6 +10,12 @@ public class QuadTree<T extends Point2D> {
 
     public static int DEFAULT_MAX_BUCKET_SIZE = 4;
     public static int DEFAULT_MAX_DEPTH = 10;
+
+    private void validatePositive(int number, String name) {
+        if (number < 1) {
+            throw new IllegalArgumentException(name + " must be a positive integer");
+        }
+    }
 
     //TODO: Maintain a hashmap of point -> node? This could speedup various operations
     // Example 1: update by iterating map, then we don't have to iterate empty leaves:
@@ -19,6 +27,8 @@ public class QuadTree<T extends Point2D> {
     }
 
     public QuadTree(float x, float y, float width, float height, int maxBucketSize, int maxDepth) {
+        validatePositive(maxBucketSize, "Max bucket size");
+        validatePositive(maxDepth, "Max tree depth");
         BoundingBox box = new BoundingBox(x, y, x + width, y + height);
         root = new Node<>(box, maxBucketSize, maxDepth);
     }

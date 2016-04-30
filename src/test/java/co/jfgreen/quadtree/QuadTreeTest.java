@@ -50,8 +50,23 @@ public class QuadTreeTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void constructor_shouldThrowException_givenNegativeSize() {
-        new QuadTree<>(0,0, -100, -100);
+    public void constructor_shouldThrowException_givenNegativeWidth() {
+        new QuadTree<>(0,0, -100, 100);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void constructor_shouldThrowException_givenNegativeHeight() {
+        new QuadTree<>(0,0, 100, -100);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void constructor_shouldThrowException_givenNegativeBucketSize() {
+        new QuadTree<>(0,0, 100, 100, -5, 10);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void constructor_shouldThrowException_givenNegativeMaxDepth() {
+        new QuadTree<>(0,0, 100, 100, 4, -10);
     }
 
     @Test(expected = QuadTreeException.class)
@@ -215,7 +230,6 @@ public class QuadTreeTest {
         assertLeaf(getNode(stateBeforeUpdate.getTopRight()), point3);
         assertLeaf(getNode(stateBeforeUpdate.getBottomLeft()), point1);
         assertLeaf(getNode(stateBeforeUpdate.getBottomRight()), point2);
-
     }
 
 
@@ -302,10 +316,22 @@ public class QuadTreeTest {
         assertThat(tree.queryByBoundingBox(-10,-10, 200, 200), containsInAnyOrder(point1, point2, point3));
     }
 
+    @Test
+    public void queryByPointRadius_shouldReturnSomePoints_givenQueryIntersectingTree() {
+        NamedPoint point1 = addPoint("1", 20, 20);
+        NamedPoint point2 = addPoint("2", 10, 15);
+        NamedPoint point3 = addPoint("3", 17, 20);
+        assertThat(tree.queryByPointRadius(-10, -10, 50), containsInAnyOrder(point1, point2, point3));
+    }
+
+    @Test
+    public void queryByBoundingBox_shouldReturnSomePoints_givenQueryIntersectingTree() {
+        NamedPoint point1 = addPoint("1", 20, 20);
+        NamedPoint point2 = addPoint("2", 10, 15);
+        NamedPoint point3 = addPoint("3", 17, 20);
+        assertThat(tree.queryByBoundingBox(-10,-10, 40, 40), containsInAnyOrder(point1, point2, point3));
+    }
+
     //TODO: Test that get state should return immutable result (Maybe test this in immutable state classes tests)
-    //TODO: What about a negative size for the tree?
-    //TODO: What about queries centered outside tree, but intersecting with tree.
-    //TODO: What about a tree that has negative item capacity
-    //TODO: What about a tree that has negative max depth
 
 }
