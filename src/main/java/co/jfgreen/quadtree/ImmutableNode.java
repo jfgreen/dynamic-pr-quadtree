@@ -9,16 +9,16 @@ public class ImmutableNode<T extends Point2D> {
 
     private final BoundingBox bounds;
     private final Collection<T> items;
-    private final Node<T> topLeft;
-    private final Node<T> topRight;
-    private final Node<T> bottomLeft;
-    private final Node<T> bottomRight;
+    private final ImmutableNode<T> topLeft;
+    private final ImmutableNode<T> topRight;
+    private final ImmutableNode<T> bottomLeft;
+    private final ImmutableNode<T> bottomRight;
 
     public ImmutableNode(BoundingBox bounds, Collection<T> items,
-                         Node<T> topLeft,
-                         Node<T> topRight,
-                         Node<T> bottomLeft,
-                         Node<T> bottomRight) {
+                         ImmutableNode<T> topLeft,
+                         ImmutableNode<T> topRight,
+                         ImmutableNode<T> bottomLeft,
+                         ImmutableNode<T> bottomRight) {
         this.topLeft = topLeft;
         this.topRight = topRight;
         this.bottomLeft = bottomLeft;
@@ -40,23 +40,20 @@ public class ImmutableNode<T extends Point2D> {
     }
 
     public Optional<ImmutableNode<T>> getTopLeft() {
-       return getImmutableChild(topLeft);
+       return Optional.ofNullable(topLeft);
     }
 
     public Optional<ImmutableNode<T>> getTopRight() {
-        return getImmutableChild(topRight);
+        return Optional.ofNullable(topRight);
     }
 
     public Optional<ImmutableNode<T>> getBottomLeft() {
-        return getImmutableChild(bottomLeft);
+        return Optional.ofNullable(bottomLeft);
     }
 
     public Optional<ImmutableNode<T>> getBottomRight() {
-        return getImmutableChild(bottomRight);
+        return Optional.ofNullable(bottomRight);
     }
 
-    private Optional<ImmutableNode<T>> getImmutableChild(Node<T> child) {
-        return Optional.ofNullable(child).map(Node::getState);
-    }
 
 }

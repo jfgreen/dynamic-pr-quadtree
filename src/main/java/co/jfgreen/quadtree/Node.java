@@ -56,7 +56,15 @@ public class Node<T extends Point2D> {
     }
 
     public ImmutableNode<T> getState() {
-        return new ImmutableNode<T>(box, points, topLeft, topRight, bottomLeft, bottomRight);
+        if (isLeaf()) {
+            return new ImmutableNode<T>(box, new HashSet<>(points), null, null, null, null);
+        } else {
+            return new ImmutableNode<T>(box, new HashSet<>(points),
+                    topLeft.getState(),
+                    topRight.getState(),
+                    bottomLeft.getState(),
+                    bottomRight.getState());
+        }
     }
 
     public Optional<Node<T>> getParent() {
@@ -77,6 +85,7 @@ public class Node<T extends Point2D> {
         return leaves;
     }
 
+    // TODO: If we remove leaves() then we dont have to have the slightly obscure traverse() here
     public Collection<T> queryByShape(Shape area) {
         Set<T> foundPoints = new HashSet<>();
         traverse((node) -> {

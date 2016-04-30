@@ -3,6 +3,7 @@ package co.jfgreen.quadtree;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.hamcrest.Matchers.*;
@@ -14,7 +15,7 @@ public class QuadTreeTest {
 
     @Before
     public void setupTree() {
-        tree = new QuadTree<>(0, 0, 100, 100);
+        tree = new QuadTree<>(0, 0, 100, 100, 4, 10);
     }
 
     private NamedPoint addPoint(String name, float x, float y) {
@@ -44,6 +45,9 @@ public class QuadTreeTest {
         assertThat(node.getItems(), containsInAnyOrder(points));
     }
 
+    private static ImmutableNode<NamedPoint> getNode(Optional<ImmutableNode<NamedPoint>> node) {
+        return node.orElseThrow(incorrectTree());
+    }
 
     @Test
     public void addPoint_shouldNotThrowException_givenPointInsideTreeBounds() {
@@ -104,6 +108,7 @@ public class QuadTreeTest {
 
     @Test
     public void getState_shouldReturnStateOfTree() {
+        // Add some points to the tree
         //TL
         NamedPoint point1 = addPoint("1", 10, 10);
         //TR
@@ -120,15 +125,17 @@ public class QuadTreeTest {
         NamedPoint point8 = addPoint("8", 76, 70);
         NamedPoint point9 = addPoint("9", 95, 85);
 
+        // Retrieve state
         ImmutableNode<NamedPoint> root = tree.getState();
-        ImmutableNode<NamedPoint> tl = root.getTopLeft().orElseThrow(incorrectTree());
-        ImmutableNode<NamedPoint> tr = root.getTopRight().orElseThrow(incorrectTree());
-        ImmutableNode<NamedPoint> bl = root.getBottomLeft().orElseThrow(incorrectTree());
-        ImmutableNode<NamedPoint> bltr = bl.getTopRight().orElseThrow(incorrectTree());
-        ImmutableNode<NamedPoint> blbl = bl.getBottomLeft().orElseThrow(incorrectTree());
-        ImmutableNode<NamedPoint> blbr = bl.getBottomRight().orElseThrow(incorrectTree());
-        ImmutableNode<NamedPoint> br = root.getBottomRight().orElseThrow(incorrectTree());
+        ImmutableNode<NamedPoint> tl = getNode(root.getTopLeft());
+        ImmutableNode<NamedPoint> tr = getNode(root.getTopRight());
+        ImmutableNode<NamedPoint> bl = getNode(root.getBottomLeft());
+        ImmutableNode<NamedPoint> bltr = getNode(bl.getTopRight());
+        ImmutableNode<NamedPoint> blbl = getNode(bl.getBottomLeft());
+        ImmutableNode<NamedPoint> blbr = getNode(bl.getBottomRight());
+        ImmutableNode<NamedPoint> br = getNode(root.getBottomRight());
 
+        // Assert state is as expected
         assertConnector(root);
         assertConnector(bl);
         assertLeaf(tl, point1);
@@ -140,19 +147,81 @@ public class QuadTreeTest {
     }
 
     @Test
-    public void update_shouldUpdateTree_givenPointsHaveMoved() {
-        throw new UnsupportedOperationException("Not yet implemented.");
+    public void getState_shouldReturnCopyOfState() {
+        // Add some points, capture state & ensure its correct
+        NamedPoint point1 = addPoint("1", 25, 25);
+        NamedPoint point2 = addPoint("2", 75, 25);
+        NamedPoint point3 = addPoint("3", 75, 75);
+        NamedPoint point4 = addPoint("4", 25, 75);
+        NamedPoint point5 = addPoint("5", 10, 10);
+        ImmutableNode<NamedPoint> state = tree.getState();
+        assertConnector(state);
+        assertLeaf(getNode(state.getTopLeft()), point1, point5);
+        assertLeaf(getNode(state.getTopRight()), point2);
+        assertLeaf(getNode(state.getBottomLeft()), point4);
+        assertLeaf(getNode(state.getBottomRight()), point3);
+
+        // Move points
+        point1.moveTo(25, 75);
+        point2.moveTo(75, 75);
+        point3.moveTo(75, 25);
+        point4.moveTo(25, 25);
+        tree.update();
+
+        // Assert capture of state has not changed.
+        assertLeaf(getNode(state.getTopLeft()), point1, point5);
+        assertLeaf(getNode(state.getTopRight()), point2);
+        assertLeaf(getNode(state.getBottomLeft()), point4);
+        assertLeaf(getNode(state.getBottomRight()), point3);
     }
 
     @Test
+    public void update_shouldUpdateTree_givenPointsHaveMoved() {
+        // Add some points
+        NamedPoint point1 = addPoint("1", 25, 25);
+        NamedPoint point2 = addPoint("2", 75, 25);
+        NamedPoint point3 = addPoint("3", 75, 75);
+        NamedPoint point4 = addPoint("4", 25, 75);
+        NamedPoint point5 = addPoint("5", 10, 10);
+
+        // Move them
+        point1.moveTo(25, 75);
+        point2.moveTo(75, 75);
+        point3.moveTo(75, 25);
+        point4.moveTo(25, 25);
+        tree.update();
+
+        // Ensure they got moved
+        ImmutableNode<NamedPoint> stateBeforeUpdate = tree.getState();
+        assertLeaf(getNode(stateBeforeUpdate.getTopLeft()), point4, point5);
+        assertLeaf(getNode(stateBeforeUpdate.getTopRight()), point3);
+        assertLeaf(getNode(stateBeforeUpdate.getBottomLeft()), point1);
+        assertLeaf(getNode(stateBeforeUpdate.getBottomRight()), point2);
+
+    }
+
+
+    @Test
     public void update_shouldNotUpdateTree_givenPointsHaveNotMoved() {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        NamedPoint point1 = addPoint("1", 25, 25);
+        assertLeaf(tree.getState(), point1);
+        tree.update();
+        assertLeaf(tree.getState(), point1);
     }
 
     @Test
     public void queryByPointRadius_shouldReturnPoints_givenPointsMovedIntoQueryArea() {
-        throw new UnsupportedOperationException("Not yet implemented.");
+        // Add point & make sure its outside of query range
+        NamedPoint point1 = addPoint("1", 25, 25);
+        assertTrue(tree.queryByPointRadius(75,75,5).isEmpty());
+        // Move point inside query range
+        point1.moveTo(72, 76);
+        tree.update();
+        // Assert that point is now inside query range
+        assertThat(tree.queryByPointRadius(75,75,5), contains(point1));
     }
+
+    /*
 
     @Test
     public void queryByBoundingBox_shouldReturnPoints_givenPointsMovedIntoQueryArea() {
@@ -178,8 +247,11 @@ public class QuadTreeTest {
     public void queryByBoundingBox_shouldReturnNoPoints_givenQueryOutsideTreeBounds() {
         throw new UnsupportedOperationException("Not yet implemented.");
     }
+    */
 
-    //TODO: What happens if point is added twice?
+    //TODO: Test that get state should return immutable result (Maybe test this in immutable state classes tests)
+    //TODO: What happens if point is added twice (by hashcode)?
+    //TODO: What happens if point is added twice (by by position)?
     //TODO: What about a negative size for the tree?
     //TODO: What about a tree that spans negative coordinates?
 
