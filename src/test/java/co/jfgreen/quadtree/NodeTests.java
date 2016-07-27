@@ -10,7 +10,7 @@ public class NodeTests {
     private final static BoundingBox BOX = new BoundingBox(0,0,100,100);
 
     @Test
-    public void coursen_shouldNoNothing_givenNodeHasNoChildren() {
+    public void coarsen_shouldNoNothing_givenNodeIsEmptyRoot() {
         Node node = new Node(BOX, BUCKET_SIZE, DEPTH);
 
         node.coarsen();
