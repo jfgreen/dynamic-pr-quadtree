@@ -3,9 +3,7 @@ package co.jfgreen.quadtree;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Optional;
-import java.util.function.Supplier;
-
+import static co.jfgreen.quadtree.TreeStateUtil.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
@@ -22,31 +20,6 @@ public class QuadTreeTest {
         NamedPoint point = new NamedPoint(name, x, y);
         tree.add(point);
         return point;
-    }
-
-    private static Supplier<RuntimeException> incorrectTree() {
-        return () -> new RuntimeException("Incorrect Tree");
-    }
-
-    private static void assertConnector(ImmutableNode<NamedPoint> node) {
-        assertTrue(node.getTopLeft().isPresent());
-        assertTrue(node.getTopRight().isPresent());
-        assertTrue(node.getBottomLeft().isPresent());
-        assertTrue(node.getBottomRight().isPresent());
-        assertTrue(node.isEmpty());
-    }
-
-    private static void assertLeaf(ImmutableNode<NamedPoint> node, NamedPoint... points) {
-        assertFalse(node.getTopLeft().isPresent());
-        assertFalse(node.getTopRight().isPresent());
-        assertFalse(node.getBottomLeft().isPresent());
-        assertFalse(node.getBottomRight().isPresent());
-        assertFalse(node.isEmpty());
-        assertThat(node.getItems(), containsInAnyOrder(points));
-    }
-
-    private static ImmutableNode<NamedPoint> getNode(Optional<ImmutableNode<NamedPoint>> node) {
-        return node.orElseThrow(incorrectTree());
     }
 
     @Test(expected = IllegalArgumentException.class)
