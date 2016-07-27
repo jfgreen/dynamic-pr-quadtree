@@ -172,9 +172,14 @@ public class Node<T extends Point2D> {
     }
 
     private boolean isCoursenable() {
-        boolean childrenAreLeaves = children().allMatch(Node::isLeaf);
-        int combinedChildPointCount = children().mapToInt(c -> c.points.size()).sum();
-        return (!isLeaf() && childrenAreLeaves) && combinedChildPointCount <= maxBucketSize;
+        if (isLeaf()) {
+            // We must check if we have children before investigating them, or else a NPE is thrown
+            return false;
+        } else {
+            boolean childrenAreLeaves = children().allMatch(Node::isLeaf);
+            int combinedChildPointCount = children().mapToInt(c -> c.points.size()).sum();
+            return childrenAreLeaves && combinedChildPointCount <= maxBucketSize;
+        }
     }
 
     private void gatherPointsFromChildren() {
