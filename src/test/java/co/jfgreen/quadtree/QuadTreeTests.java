@@ -7,7 +7,7 @@ import static co.jfgreen.quadtree.TreeStateUtil.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
-public class QuadTreeTest {
+public class QuadTreeTests {
 
     private QuadTree<NamedPoint> tree;
 
