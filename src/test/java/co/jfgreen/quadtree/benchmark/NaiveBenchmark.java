@@ -26,7 +26,7 @@ public class NaiveBenchmark {
     }
 
     @Benchmark
-    public void testQuadtreePointRadiusQuery() {
+    public void testPointRadiusQuery() {
         localityCheckEachAgent(CIRCLE_RADIUS);
         swarm.tick();
     }
@@ -36,7 +36,7 @@ public class NaiveBenchmark {
     }
 
     private Collection<Agent> getAgentsWithinRadius(float x, float y, float radius) {
-        return swarm.getAgents().parallelStream()
+        return swarm.getAgents().stream()
                 .filter(a -> distanceBetween(a.getX(), a.getY(), x, y) <= radius).collect(toList());
     }
 

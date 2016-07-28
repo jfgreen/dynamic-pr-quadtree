@@ -29,7 +29,7 @@ public class QuadTreeBenchmark {
     }
 
     @Benchmark
-    public void testQuadtreePointRadiusQuery() {
+    public void testPointRadiusQuery() {
         localityCheckEachAgent(CIRCLE_RADIUS);
         swarm.tick();
         quadtree.update();
