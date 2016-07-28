@@ -6,8 +6,8 @@ public class QuadTree<T extends Point2D> {
 
     private final Node<T> root;
 
-    public static int DEFAULT_MAX_BUCKET_SIZE = 4;
-    public static int DEFAULT_MAX_DEPTH = 10;
+    public static int DEFAULT_MAX_BUCKET_SIZE = 100;
+    public static int DEFAULT_MAX_DEPTH = 5;
 
     private void validatePositive(int number, String name) {
         if (number < 1) {
@@ -20,6 +20,7 @@ public class QuadTree<T extends Point2D> {
     // Example 2: easy duplicate check on 'add'
     // Example 3: easy removal
 
+    //TODO: Think about having a builder pattern
     public QuadTree(float x, float y, float width, float height) {
        this(x, y, width, height, DEFAULT_MAX_BUCKET_SIZE, DEFAULT_MAX_DEPTH);
     }
@@ -38,6 +39,10 @@ public class QuadTree<T extends Point2D> {
         Node<T> destination = findLeafEnclosing(root, point);
         destination.addPoint(point);
         destination.refine();
+    }
+
+    public void addAll(Collection<T> points) {
+        points.forEach(this::add);
     }
 
     public ImmutableNode<T> getState() {

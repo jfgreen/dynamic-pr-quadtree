@@ -11,11 +11,14 @@ import static org.junit.Assert.*;
 
 public class QuadTreeTest {
 
+    // Changing these will invalidate tests
+    private final static int BUCKET_SIZE = 4;
+    private final static int MAX_DEPTH = 4;
     private QuadTree<NamedPoint> tree;
 
     @Before
     public void setupTree() {
-        tree = new QuadTree<>(0, 0, 100, 100, 4, 10);
+        tree = new QuadTree<>(0, 0, 100, 100, BUCKET_SIZE, MAX_DEPTH);
     }
 
     private NamedPoint addPoint(String name, float x, float y) {
@@ -225,13 +228,12 @@ public class QuadTreeTest {
         tree.update();
 
         // Ensure they got moved
-        ImmutableNode<NamedPoint> stateBeforeUpdate = tree.getState();
-        assertLeaf(getNode(stateBeforeUpdate.getTopLeft()), point4, point5);
-        assertLeaf(getNode(stateBeforeUpdate.getTopRight()), point3);
-        assertLeaf(getNode(stateBeforeUpdate.getBottomLeft()), point1);
-        assertLeaf(getNode(stateBeforeUpdate.getBottomRight()), point2);
+        ImmutableNode<NamedPoint> stateAfterUpdate = tree.getState();
+        assertLeaf(getNode(stateAfterUpdate.getTopLeft()), point4, point5);
+        assertLeaf(getNode(stateAfterUpdate.getTopRight()), point3);
+        assertLeaf(getNode(stateAfterUpdate.getBottomLeft()), point1);
+        assertLeaf(getNode(stateAfterUpdate.getBottomRight()), point2);
     }
-
 
     @Test
     public void update_shouldNotUpdateTree_givenPointsHaveNotMoved() {
