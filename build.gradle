@@ -15,7 +15,7 @@ sourceCompatibility = 1.8
 
 task bench(type: JavaExec, dependsOn: [classes, testClasses]) {
     classpath = sourceSets.test.runtimeClasspath
-    main = "co.jfgreen.quadtree.Benchmark";
+    main = "co.jfgreen.quadtree.benchmark.SwarmBenchmarks";
 }
 
 test {
