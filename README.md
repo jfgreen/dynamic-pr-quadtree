@@ -6,6 +6,8 @@ This is going to be an implementation of a PR quadtree designed to handle moving
 
 ## TODO:
 
+- Finish adding perf test
+- Add NN/kNN query method.
 - Finish writing unit tests.
 - Implement some benchmarks vs naive n^2 and Apache SIS
 - Then use these to experiment with the following optimisations. For each, either include it outright,
