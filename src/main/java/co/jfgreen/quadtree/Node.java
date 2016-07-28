@@ -95,14 +95,19 @@ public class Node<T extends Point2D> {
     }
 
     // TODO: If we remove leaves() then we dont have to have the slightly obscure traverse() here
+    // TODO: Instead we could have a getLeavesIntersecting() (which traverses down) and then filter all candidate leaves
     public Collection<T> queryByShape(Shape area) {
-        Set<T> foundPoints = new HashSet<>();
+        Collection<T> foundPoints = new LinkedList<>();
         traverse((node) -> {
             if (node.isLeaf()) {
                 if (area.contains(box)) {
                     foundPoints.addAll(node.points);
                 } else {
-                    node.points.stream().filter(p -> area.contains(p.getX(), p.getY())).forEach(foundPoints::add);
+                    for (T p : node.points) {
+                        if (area.contains(p.getX(), p.getY())) {
+                            foundPoints.add(p);
+                        }
+                    }
                 }
                 return Collections.EMPTY_LIST;
             } else {
