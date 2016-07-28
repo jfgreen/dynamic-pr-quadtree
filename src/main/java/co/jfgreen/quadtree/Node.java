@@ -209,5 +209,13 @@ public class Node<T extends Point2D> {
         return children().filter(c -> c.encloses(point)).findFirst();
     }
 
+    @Override
+    public String toString() {
+        return "Node{" +
+                "depth=" + depth +
+                ", box=" + box +
+                ", points=" + points.size() +
+                '}';
+    }
 }
 
