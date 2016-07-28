@@ -99,7 +99,11 @@ public class Node<T extends Point2D> {
         Set<T> foundPoints = new HashSet<>();
         traverse((node) -> {
             if (node.isLeaf()) {
-                foundPoints.addAll(node.getPointsEnclosedBy(area));
+                if (area.contains(box)) {
+                    foundPoints.addAll(node.points);
+                } else {
+                    node.points.stream().filter(p -> area.contains(p.getX(), p.getY())).forEach(foundPoints::add);
+                }
                 return Collections.EMPTY_LIST;
             } else {
                 return node.childrenIntersecting(area);
@@ -110,14 +114,6 @@ public class Node<T extends Point2D> {
 
     private Collection<Node<T>> childrenIntersecting(Shape area) {
         return children().filter(c -> area.intersects(c.box)).collect(Collectors.toList());
-    }
-
-    private Collection<T> getPointsEnclosedBy(Shape area) {
-        if (area.contains(box)) {
-            return points;
-        } else {
-            return points.stream().filter(p -> area.contains(p.getX(), p.getY())).collect(Collectors.toList());
-        }
     }
 
     private void traverse(Function<Node<T>, Collection<Node<T>>> visitor) {
